@@ -2,10 +2,11 @@
 /// https://academy.cosmwasm.com/learn/smart-contracts/prepare-a-project
 /// 
 /// code examples and comments are taken from the tutorial
-/// 
+/// check with 
+/// cosmwasm-check ./target/wasm32-unknown-unknown/release/counting_contract.wasm
 
 use cosmwasm_std::{
-    DepsMut, Env, MessageInfo, Empty, StdResult, Response, entry_point
+    entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
 };
 
 /// the entry point is the first function called by CosmWasm virtual machine 
@@ -31,6 +32,9 @@ use cosmwasm_std::{
 ///     for now, it is the Empty type that represents {} JSON, 
 ///     but the type of this argument can be anything that is deserializable
 /// 
+/// StdResult<Response> is used as a return tyüe for this simple example
+/// it's an alias for Result<Response, StdError>
+/// 
 /// the entry point is decorated by the #[entry_point] attribute
 /// it's wrapping the whole entry point to the form Wasm runtime understands
 #[entry_point]
@@ -41,4 +45,23 @@ pub fn instantiate(
 	_msg:  Empty,
 ) -> StdResult<Response> {
 	Ok(Response::new())
+}
+
+#[entry_point]
+pub fn execute(
+    _deps: DepsMut, 
+    _env: Env, 
+    _info: MessageInfo, 
+    _msg: Empty
+) -> StdResult<Response> {
+    Ok(Response::new())
+}
+
+#[entry_point]
+pub fn query(
+    _deps: Deps, 
+    _env: Env, 
+    _msg: Empty
+) -> StdResult<Binary> {
+    Ok(Binary::default())
 }
