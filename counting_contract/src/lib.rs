@@ -9,6 +9,8 @@ use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
 };
 
+pub mod msg;
+
 /// the entry point is the first function called by CosmWasm virtual machine 
 /// when action is performed on a smart contract
 /// unlike native binaries, smart contracts have multiple entry points
@@ -37,6 +39,9 @@ use cosmwasm_std::{
 /// 
 /// the entry point is decorated by the #[entry_point] attribute
 /// it's wrapping the whole entry point to the form Wasm runtime understands
+/// 
+/// the instantiate entry point is called when the smart contract is created for the first time
+/// it's like a constructor for a contract
 #[entry_point]
 pub fn instantiate(
 	_deps: DepsMut,
@@ -47,6 +52,8 @@ pub fn instantiate(
 	Ok(Response::new())
 }
 
+/// the execute entry point is for handling messages which are able to modify contract state
+/// they are used to perform some actual actions
 #[entry_point]
 pub fn execute(
     _deps: DepsMut, 
@@ -57,6 +64,8 @@ pub fn execute(
     Ok(Response::new())
 }
 
+/// the query entry point is for handling messages requesting some information from a contract
+/// they can never affect any contract state, and are used just like database queries
 #[entry_point]
 pub fn query(
     _deps: Deps, 
