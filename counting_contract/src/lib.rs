@@ -9,6 +9,9 @@ use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
 };
 
+/// contract module for logic implementation
+/// it's private because it contains internal contract logic
+mod contract;
 pub mod msg;
 
 /// the entry point is the first function called by CosmWasm virtual machine 
