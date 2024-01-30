@@ -6,7 +6,7 @@
 /// cosmwasm-check ./target/wasm32-unknown-unknown/release/counting_contract.wasm
 
 use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
+    entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_json_binary
 };
 
 /// contract module for logic implementation
@@ -69,11 +69,26 @@ pub fn execute(
 
 /// the query entry point is for handling messages requesting some information from a contract
 /// they can never affect any contract state, and are used just like database queries
+/// -> deps argument is of type Deps instead of DepsMut
+///    because queries can never modify any blockchain state
+/// -> there is no MessageInfo argument
+///    queries can never depend on who sends the message 
+///    or on any query circumstances besides the blockchain state itself
+///    queries also never have funds sent with them
+/// -> the returned type is not a Response, but a Binary type instead
+///     it is because the query returns arbitrary data to the querier 
+///     instead of processing a full actor flow which is handled with Response type
+/// -> querys should be pure function calls that give back the smart contract state
 #[entry_point]
 pub fn query(
     _deps: Deps, 
     _env: Env, 
-    _msg: Empty
+    msg: msg::QueryMsg
 ) -> StdResult<Binary> {
-    Ok(Binary::default())
+    use msg::QueryMsg::*;
+    use contract::query;
+ 
+    match msg {
+        Value {} => to_json_binary(&query::value()),
+    }
 }
