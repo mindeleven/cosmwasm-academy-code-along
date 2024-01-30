@@ -90,6 +90,7 @@ pub fn query(
  
     match msg {
         Value {} => to_json_binary(&query::value()),
+        Incremented { value } => to_json_binary(&query::incremented(value)),
     }
 }
 

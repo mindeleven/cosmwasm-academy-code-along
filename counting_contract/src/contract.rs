@@ -6,4 +6,10 @@ pub mod query {
     pub fn value() -> ValueResp {
         ValueResp { value: 0 }
     }
+    
+    // assignment lesson 3: add query to the contract 
+    // taking a single number as its argument and returning the send argument incremented
+    pub fn incremented(value: u64) -> ValueResp {
+        ValueResp { value: value + 1 }
+    }
 }

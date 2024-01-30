@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 pub enum QueryMsg {
     // curly braces here are related to how serde is serializing JSON values
     Value {},
+    Incremented { value: u64 },
 }
 
 /// second message I created is a response to the Value query
