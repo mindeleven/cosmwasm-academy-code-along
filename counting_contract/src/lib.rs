@@ -110,15 +110,43 @@ mod test {
     // but for this tutorial the returned Contract will always be empty
     fn counting_contract() -> Box<dyn Contract<Empty>> {
         let contract = ContractWrapper::new(execute, instantiate, query);
+        // returning an object which can be used with multitest
         Box::new(contract)
     }
 
     #[test]
     fn query_value() {
+        // an App object is the blockchain simulator
+        // creating a default App instance
         let mut app = App::default();
-    
+        
+        // registering the contract object in the blockchain
+        // returns the contract ID
+        // for the test there is no code stored anywhere 
+        // but it performs an equivalent of storing code on the blockchain
         let contract_id = app.store_code(counting_contract());
-    
+
+        // contract instantiation
+        // -> the next step is contract instantiation - creating the contract on the blockchain
+        // instantiate the contract with the contract ID
+        // uploaded code id is the ID returned from the store_code call
+
+        // the sender is the address which sends the message
+        // to create a CosmWasm address, we are using the Addr::unchecked function
+        // Addr::unchecked("sender") creates an arbitrary address
+
+        // the instantiation message we send to the contract is an Empty message here
+        // it is first serialized to JSON and then deserialized back to send it to the contract
+
+        // definition of native funds we want to send with the message
+        // most messages can have some tokens sent with them, we pass an empty slice for now
+
+        // next: label of the contract
+        // -> the human-readable name of the created contract
+
+        // admin address of the contract
+        // -> admins are the only addresses that can later perform migrations of smart contracts
+
         let contract_addr = app
             .instantiate_contract(
                 contract_id,
@@ -129,7 +157,15 @@ mod test {
                 None,
             )
             .unwrap();
-    
+        
+        // if instantiate_contract() is successful we get back the contract address
+        // and can use it to query the contract
+
+        // querying the contract
+        // to query the contract on the blockchain we first need to call the wrap() method
+        // it converts the app object to a temporary QuerierWrapper object
+        // which allows us to query the blockchain
+        // to query the contract, we use the query_wasm_smart function
         let resp: ValueResp = app
             .wrap()
             .query_wasm_smart(contract_addr, &QueryMsg::Value {})
