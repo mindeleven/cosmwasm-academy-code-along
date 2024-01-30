@@ -1,5 +1,3 @@
-use crate::msg::ValueResp;
- 
 pub mod query {
     use crate::msg::ValueResp;
     
