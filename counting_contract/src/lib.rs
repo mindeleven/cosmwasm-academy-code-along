@@ -92,3 +92,16 @@ pub fn query(
         Value {} => to_json_binary(&query::value()),
     }
 }
+
+/// testing the contract with a multitest in a contract wrapper 
+/// the contract wrapper would forward all messages to the proper entry point
+/// -> writing a function that creates such a wrapper
+#[cfg(test)]
+mod test {
+    use cosmwasm_std::Empty;
+    use cw_multi_test::Contract;
+ 
+    fn counting_contract() -> Box<dyn Contract<Empty>> {
+        todo!()
+    }
+}
