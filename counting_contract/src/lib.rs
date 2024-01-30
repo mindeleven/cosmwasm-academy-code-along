@@ -100,9 +100,10 @@ pub fn query(
 /// the execute entry point is needed it for multitest
 #[cfg(test)]
 mod test {
-    use cosmwasm_std::Empty;
-    use cw_multi_test::Contract;
-    use cw_multi_test::ContractWrapper;
+    use cosmwasm_std::{Addr, Empty};
+    use cw_multi_test::{App, Contract, ContractWrapper, Executor};
+
+    use crate::msg::{QueryMsg, ValueResp};
     use crate::{execute, instantiate, query};
     
     // some cosmos blockchains need to have a contract returned here 
@@ -110,6 +111,31 @@ mod test {
     fn counting_contract() -> Box<dyn Contract<Empty>> {
         let contract = ContractWrapper::new(execute, instantiate, query);
         Box::new(contract)
+    }
+
+    #[test]
+    fn query_value() {
+        let mut app = App::default();
+    
+        let contract_id = app.store_code(counting_contract());
+    
+        let contract_addr = app
+            .instantiate_contract(
+                contract_id,
+                Addr::unchecked("sender"),
+                &Empty {},
+                &[],
+                "Counting contract",
+                None,
+            )
+            .unwrap();
+    
+        let resp: ValueResp = app
+            .wrap()
+            .query_wasm_smart(contract_addr, &QueryMsg::Value {})
+            .unwrap();
+    
+        assert_eq!(resp, ValueResp { value: 0 });
     }
 
 }
