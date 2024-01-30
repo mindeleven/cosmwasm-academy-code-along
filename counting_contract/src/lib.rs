@@ -97,12 +97,19 @@ pub fn query(
 /// testing the contract with a multitest in a contract wrapper 
 /// the contract wrapper would forward all messages to the proper entry point
 /// -> writing a function that creates such a wrapper
+/// the execute entry point is needed it for multitest
 #[cfg(test)]
 mod test {
     use cosmwasm_std::Empty;
     use cw_multi_test::Contract;
- 
+    use cw_multi_test::ContractWrapper;
+    use crate::{execute, instantiate, query};
+    
+    // some cosmos blockchains need to have a contract returned here 
+    // but for this tutorial the returned Contract will always be empty
     fn counting_contract() -> Box<dyn Contract<Empty>> {
-        todo!()
+        let contract = ContractWrapper::new(execute, instantiate, query);
+        Box::new(contract)
     }
+
 }
