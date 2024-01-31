@@ -14,6 +14,15 @@ pub enum QueryMsg {
     Incremented { value: u64 },
 }
 
+// creating a new message for the execute entry point
+// define an enum with a single variant per execution message we want to handle
+// the message handler for this is in src/contract.rs
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ExecMsg {
+    Poke {},
+}
+
 /// second message I created is a response to the Value query
 /// very similar to the Query message but a struct this time
 /// the rename_all attribute is unnecessary but there for consistency
