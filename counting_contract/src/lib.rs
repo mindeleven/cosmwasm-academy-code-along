@@ -57,6 +57,11 @@ pub fn instantiate(
 ) -> StdResult<Response> {
     // initializing the state
     // storing some default value on contract instantiation
+    // storing is done by calling the save method on the accessor (the Item)
+    // the function takes two arguments:
+    // -> 1st one is the object implementing Storage trait
+    // -> 2nd argument is data is to be stored
+    // save function returns StdError type so the ? operator is needed
     COUNTER.save(deps.storage, &0)?;
 
 	Ok(Response::new())
