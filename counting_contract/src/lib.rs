@@ -13,6 +13,7 @@ use cosmwasm_std::{
 /// it's private because it contains internal contract logic
 mod contract;
 pub mod msg;
+mod state;
 
 /// the entry point is the first function called by CosmWasm virtual machine 
 /// when action is performed on a smart contract
