@@ -29,11 +29,14 @@ pub mod query {
 
 /// creating a message handler for the execute entry point
 pub mod exec {
-    use cosmwasm_std::{DepsMut, Response, StdResult};
+    use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
  
     use crate::state::COUNTER;
- 
-    pub fn poke(deps: DepsMut) -> StdResult<Response> {
+
+    // adding the MessageInfo to the update function
+    // -> MessageInfo contains additional metadata about the sent message 
+    // (message sender and the funds sent)
+    pub fn poke(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
         // similar to instantiate, but instead of just storing value in the COUNTER
         // the update function is used to update the underlying value
 
@@ -46,12 +49,34 @@ pub mod exec {
 
         // Rust has to know what type it should use because the error type is never used here
         // the type hint for the type returned from closure has to be provided
-
+        /* 
         COUNTER.update(
             deps.storage, 
             |counter| -> StdResult<_> { Ok(counter + 1) }
         )?;
+        */
+        
+        // splitting updating the counter to keep the new counter value for further usage
+
+        let counter = COUNTER.load(deps.storage)? + 1;
+        COUNTER.save(deps.storage, &counter)?;
+        
+        // every execution emits events (logs reporting what was perfromed by an action)
+        // an event contains a type and the set of key-value pairs named attributes
+
+        // events are emitted from execution using the Response::add_event function
+        // passing the constructed Event type
+
+        // every execution emits at least one default event
+        // to add attributes to the wasm event we can use a Response::add_attribute function
+        // adding three attributes to Response object: action, sender & counter
+        let resp = Response::new()
+            .add_attribute("action", "poke")
+            .add_attribute("sender", info.sender.as_str())
+            .add_attribute("counter", counter.to_string());
  
-        Ok(Response::new())
+        // Ok(Response::new())
+        Ok(resp)
+
     }
 }
