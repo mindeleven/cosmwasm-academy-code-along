@@ -93,7 +93,7 @@ pub fn execute(
 /// -> querys should be pure function calls that give back the smart contract state
 #[entry_point]
 pub fn query(
-    _deps: Deps, 
+    deps: Deps, 
     _env: Env, 
     msg: msg::QueryMsg
 ) -> StdResult<Binary> {
@@ -101,7 +101,8 @@ pub fn query(
     use contract::query;
  
     match msg {
-        Value {} => to_json_binary(&query::value()),
+        // Value {} => to_json_binary(&query::value()),
+        Value {} => to_json_binary(&query::value(deps)?),
         Incremented { value } => to_json_binary(&query::incremented(value)),
     }
 }
