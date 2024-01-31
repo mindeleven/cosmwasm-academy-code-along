@@ -9,6 +9,8 @@ use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_json_binary
 };
 
+use state::COUNTER;
+
 /// contract module for logic implementation
 /// it's private because it contains internal contract logic
 mod contract;
@@ -48,11 +50,15 @@ mod state;
 /// it's like a constructor for a contract
 #[entry_point]
 pub fn instantiate(
-	_deps: DepsMut,
+	deps: DepsMut,
 	_env:  Env,
 	_info: MessageInfo,
 	_msg:  Empty,
 ) -> StdResult<Response> {
+    // initializing the state
+    // storing some default value on contract instantiation
+    COUNTER.save(deps.storage, &0)?;
+
 	Ok(Response::new())
 }
 
