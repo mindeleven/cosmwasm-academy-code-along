@@ -71,12 +71,17 @@ pub fn instantiate(
 /// they are used to perform some actual actions
 #[entry_point]
 pub fn execute(
-    _deps: DepsMut, 
+    deps: DepsMut, 
     _env: Env, 
     _info: MessageInfo, 
-    _msg: Empty
+    msg: msg::ExecMsg,
 ) -> StdResult<Response> {
-    Ok(Response::new())
+    use contract::exec;
+    use msg::ExecMsg::*;
+ 
+    match msg {
+        Poke {} => exec::poke(deps),
+    }
 }
 
 /// the query entry point is for handling messages requesting some information from a contract
