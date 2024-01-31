@@ -26,3 +26,32 @@ pub mod query {
     }
     
 }
+
+/// creating a message handler for the execute entry point
+pub mod exec {
+    use cosmwasm_std::{DepsMut, Response, StdResult};
+ 
+    use crate::state::COUNTER;
+ 
+    pub fn poke(deps: DepsMut) -> StdResult<Response> {
+        // similar to instantiate, but instead of just storing value in the COUNTER
+        // the update function is used to update the underlying value
+
+        // the update function takes the (1) borrow to the storage object 
+        // and then (2) the closure, which would be executed on the underlying object
+        
+        // the value returned by the closure should be a Result 
+        // with the type stored as a COUNTER in an Ok variant
+        // the Err variant can be anything implementing From<cosmwasm_std::StdError>
+
+        // Rust has to know what type it should use because the error type is never used here
+        // the type hint for the type returned from closure has to be provided
+
+        COUNTER.update(
+            deps.storage, 
+            |counter| -> StdResult<_> { Ok(counter + 1) }
+        )?;
+ 
+        Ok(Response::new())
+    }
+}
