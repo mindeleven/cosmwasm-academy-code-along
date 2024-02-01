@@ -79,4 +79,18 @@ pub mod exec {
         Ok(resp)
 
     }
+    
+    // assignment lesson 6: adding another execution message
+    // which resets an internal counter (setting it to given value)
+    pub fn reset(deps: DepsMut, info: MessageInfo, counter: u64) -> StdResult<Response> {
+        COUNTER.save(deps.storage, &counter)?;
+
+        let resp = Response::new()
+            .add_attribute("action", "reset")
+            .add_attribute("sender", info.sender.as_str())
+            .add_attribute("counter", counter.to_string());
+
+        Ok(resp)
+    }
+
 }
