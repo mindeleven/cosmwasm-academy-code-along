@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct InstantiateMsg {
     #[serde(default)]
     pub counter: u64,
+    // initializing a minimal donation
     pub minimal_donation: Coin,
 }
 
@@ -29,6 +30,7 @@ pub enum QueryMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecMsg {
+    // removing poke and adding donate Msg
     // Poke {},
     Donate {},
     Reset {

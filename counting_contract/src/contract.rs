@@ -8,6 +8,7 @@ pub fn instantiate(
     minimal_donation: Coin
 ) -> StdResult<Response> {
     COUNTER.save(deps.storage, &counter)?;
+    // initializing a minimal donation
     MINIMAL_DONATION.save(deps.storage, &minimal_donation)?;
     Ok(Response::new())
 }
@@ -79,9 +80,16 @@ pub mod exec {
         let mut counter = COUNTER.load(deps.storage)?;
         let minimal_donation = MINIMAL_DONATION.load(deps.storage)?;
 
+        // we're having a minimal donation you want to count
+        // now we want to iterate through all the funds sent to the contract 
+        // and find out if there is any which is of expected denom, and minimal amount
+        // funds sent with the message can be addressed using the funds field of the info argument
         if info.funds.iter().any(|coin| {
+            // to filter interesting donations
+            // you first need to load a minimal donation from the state
             coin.denom == minimal_donation.denom && coin.amount >= minimal_donation.amount
         }) {
+            // not loading a counter if it should not be incremented to save gas
             counter += 1;
             COUNTER.save(deps.storage, &counter)?;
         }

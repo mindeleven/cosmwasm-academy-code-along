@@ -275,6 +275,9 @@ mod test {
 
     #[test]
     fn donate_with_funds() {
+        // we need to set some initial "sender" tokens balance while creating an app
+        // Multi-test is a blockchain simulator that refuses to send tokens out of nowhere
+
         let sender = Addr::unchecked("sender");
 
         let mut app = App::new(|router, _api, storage| {
