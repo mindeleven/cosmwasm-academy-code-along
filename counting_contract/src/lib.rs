@@ -6,10 +6,10 @@
 /// cosmwasm-check ./target/wasm32-unknown-unknown/release/counting_contract.wasm
 
 use cosmwasm_std::{
-    entry_point, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult, to_json_binary
+    entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary
 };
 
-use state::COUNTER;
+use msg::InstantiateMsg;
 
 /// contract module for logic implementation
 /// it's private because it contains internal contract logic
@@ -53,7 +53,7 @@ pub fn instantiate(
 	deps: DepsMut,
 	_env:  Env,
 	_info: MessageInfo,
-	_msg:  Empty,
+	msg: InstantiateMsg,
 ) -> StdResult<Response> {
     // initializing the state
     // storing some default value on contract instantiation
@@ -62,9 +62,10 @@ pub fn instantiate(
     // -> 1st one is the object implementing Storage trait
     // -> 2nd argument is data is to be stored
     // save function returns StdError type so the ? operator is needed
-    COUNTER.save(deps.storage, &0)?;
+    //COUNTER.save(deps.storage, &0)?;
 
-	Ok(Response::new())
+	//Ok(Response::new())
+    contract::instantiate(deps, msg.counter)
 }
 
 /// the execute entry point is for handling messages which are able to modify contract state
