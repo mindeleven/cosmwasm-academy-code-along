@@ -65,7 +65,9 @@ pub fn instantiate(
     //COUNTER.save(deps.storage, &0)?;
 
 	//Ok(Response::new())
-    contract::instantiate(deps, msg.counter)
+    // contract::instantiate(deps, msg.counter)
+
+    contract::instantiate(deps, msg.counter, msg.minimal_donation)
 }
 
 /// the execute entry point is for handling messages which are able to modify contract state
@@ -81,7 +83,8 @@ pub fn execute(
     use msg::ExecMsg::*;
  
     match msg {
-        Poke {} => exec::poke(deps, info),
+        // Poke {} => exec::poke(deps, info),
+        Donate {} => exec::donate(deps, info),
         Reset { counter } => exec::reset(deps, info, counter),
     }
 }
@@ -120,7 +123,8 @@ pub fn query(
 /// the execute entry point is needed it for multitest
 #[cfg(test)]
 mod test {
-    use cosmwasm_std::{Addr, Empty};
+    // use cosmwasm_std::{Addr, Empty};
+    use cosmwasm_std::{coin, coins, Addr, Empty};
     use cw_multi_test::{App, Contract, ContractWrapper, Executor};
 
     use crate::msg::{ExecMsg, InstantiateMsg, QueryMsg, ValueResp};
@@ -171,7 +175,11 @@ mod test {
             .instantiate_contract(
                 contract_id,
                 Addr::unchecked("sender"),
-                &Empty {},
+                // &Empty {},
+                &InstantiateMsg {
+                    counter: 10,
+                    minimal_donation: coin(10, "atom"),
+                },
                 &[],
                 "Counting contract",
                 None,
@@ -191,9 +199,11 @@ mod test {
             .query_wasm_smart(contract_addr, &QueryMsg::Value {})
             .unwrap();
     
-        assert_eq!(resp, ValueResp { value: 0 });
+        // assert_eq!(resp, ValueResp { value: 0 });
+        assert_eq!(resp, ValueResp { value: 10 });
     }
-
+/* 
+    // poke got replaced with donate so no test for poking
     #[test]
     fn poke() {
         let mut app = App::default();
@@ -226,6 +236,86 @@ mod test {
     
         assert_eq!(resp, ValueResp { value: 1 });
     }
+*/
+    #[test]
+    fn donate() {
+        let mut app = App::default();
+
+        let contract_id = app.store_code(counting_contract());
+
+        let contract_addr = app
+            .instantiate_contract(
+                contract_id,
+                Addr::unchecked("sender"),
+                &InstantiateMsg {
+                    counter: 0,
+                    minimal_donation: coin(10, "atom"),
+                },
+                &[],
+                "Counting contract",
+                None,
+            )
+            .unwrap();
+
+        app.execute_contract(
+            Addr::unchecked("sender"),
+            contract_addr.clone(),
+            &ExecMsg::Donate {},
+            &[],
+        )
+        .unwrap();
+
+        let resp: ValueResp = app
+            .wrap()
+            .query_wasm_smart(contract_addr, &QueryMsg::Value {})
+            .unwrap();
+
+        assert_eq!(resp, ValueResp { value: 0 });
+    }
+
+    #[test]
+    fn donate_with_funds() {
+        let sender = Addr::unchecked("sender");
+
+        let mut app = App::new(|router, _api, storage| {
+            router
+                .bank
+                .init_balance(storage, &sender, coins(10, "atom"))
+                .unwrap();
+        });
+
+        let contract_id = app.store_code(counting_contract());
+
+        let contract_addr = app
+            .instantiate_contract(
+                contract_id,
+                Addr::unchecked("sender"),
+                &InstantiateMsg {
+                    counter: 0,
+                    minimal_donation: coin(10, "atom"),
+                },
+                &[],
+                "Counting contract",
+                None,
+            )
+            .unwrap();
+
+        app.execute_contract(
+            Addr::unchecked("sender"),
+            contract_addr.clone(),
+            &ExecMsg::Donate {},
+            &coins(10, "atom"),
+        )
+        .unwrap();
+
+        let resp: ValueResp = app
+            .wrap()
+            .query_wasm_smart(contract_addr, &QueryMsg::Value {})
+            .unwrap();
+
+        assert_eq!(resp, ValueResp { value: 1 });
+    }
+
 
     #[test]
     fn reset() {
@@ -237,7 +327,10 @@ mod test {
             .instantiate_contract(
                 contract_id,
                 Addr::unchecked("sender"),
-                &InstantiateMsg { counter: 0 },
+                &InstantiateMsg { 
+                    counter: 0,
+                    minimal_donation: coin(10, "atom"),
+                },
                 &[],
                 "Counting contract",
                 None,

@@ -1,9 +1,14 @@
-use cosmwasm_std::{DepsMut, Response, StdResult};
+use cosmwasm_std::{Coin, DepsMut, Response, StdResult};
 
-use crate::state::COUNTER;
+use crate::state::{COUNTER, MINIMAL_DONATION};
 
-pub fn instantiate(deps: DepsMut, counter: u64) -> StdResult<Response> {
+pub fn instantiate(
+    deps: DepsMut, 
+    counter: u64,
+    minimal_donation: Coin
+) -> StdResult<Response> {
     COUNTER.save(deps.storage, &counter)?;
+    MINIMAL_DONATION.save(deps.storage, &minimal_donation)?;
     Ok(Response::new())
 }
 
@@ -40,12 +45,14 @@ pub mod query {
 pub mod exec {
     use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
  
-    use crate::state::COUNTER;
+    use crate::state::{COUNTER, MINIMAL_DONATION};
 
     // adding the MessageInfo to the update function
     // -> MessageInfo contains additional metadata about the sent message 
     // (message sender and the funds sent)
-    pub fn poke(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
+    // replacing poke with donate functionality
+    // pub fn poke(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
+    pub fn donate(deps: DepsMut, info: MessageInfo) -> StdResult<Response> {
         // similar to instantiate, but instead of just storing value in the COUNTER
         // the update function is used to update the underlying value
 
@@ -67,8 +74,17 @@ pub mod exec {
         
         // splitting updating the counter to keep the new counter value for further usage
 
-        let counter = COUNTER.load(deps.storage)? + 1;
-        COUNTER.save(deps.storage, &counter)?;
+        // let counter = COUNTER.load(deps.storage)? + 1;
+        // COUNTER.save(deps.storage, &counter)?;
+        let mut counter = COUNTER.load(deps.storage)?;
+        let minimal_donation = MINIMAL_DONATION.load(deps.storage)?;
+
+        if info.funds.iter().any(|coin| {
+            coin.denom == minimal_donation.denom && coin.amount >= minimal_donation.amount
+        }) {
+            counter += 1;
+            COUNTER.save(deps.storage, &counter)?;
+        }
         
         // every execution emits events (logs reporting what was perfromed by an action)
         // an event contains a type and the set of key-value pairs named attributes
