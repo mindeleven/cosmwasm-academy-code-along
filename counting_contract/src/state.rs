@@ -10,4 +10,6 @@ use cw_storage_plus::Item;
 pub const COUNTER: Item<u64> = Item::new("counter");
 /// Coin is a type representing a single native token amount 
 /// it contains a denominator (its unique identifier) and the number of tokens sent
+/// contract should only accept messages with a minimal amount of coins
+/// setting constant for this minimal amount
 pub const MINIMAL_DONATION: Item<Coin> = Item::new("minimal_donation");
