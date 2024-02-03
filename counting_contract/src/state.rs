@@ -1,4 +1,4 @@
-use cosmwasm_std::Coin;
+use cosmwasm_std::{Addr, Coin};
 use cw_storage_plus::Item;
 
 /// the contract state is defined by creating accessors to the state objects
@@ -13,3 +13,5 @@ pub const COUNTER: Item<u64> = Item::new("counter");
 /// contract should only accept messages with a minimal amount of coins
 /// setting constant for this minimal amount
 pub const MINIMAL_DONATION: Item<Coin> = Item::new("minimal_donation");
+/// keeping information about who created the contract
+pub const OWNER: Item<Addr> = Item::new("owner");
