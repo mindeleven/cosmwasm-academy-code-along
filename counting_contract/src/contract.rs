@@ -3,9 +3,9 @@ use cosmwasm_std::{Coin, DepsMut, Response, StdResult, MessageInfo};
 use crate::state::{COUNTER, MINIMAL_DONATION, OWNER};
 
 pub fn instantiate(
-    deps: DepsMut, 
-    counter: u64,
+    deps: DepsMut,
     info: MessageInfo,
+    counter: u64,
     minimal_donation: Coin
 ) -> StdResult<Response> {
     COUNTER.save(deps.storage, &counter)?;
@@ -48,9 +48,10 @@ pub mod query {
 
 /// creating a message handler for the execute entry point
 pub mod exec {
-    use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
+    // use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
+    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
  
-    use crate::state::{COUNTER, MINIMAL_DONATION};
+    use crate::state::{COUNTER, MINIMAL_DONATION, OWNER};
 
     // adding the MessageInfo to the update function
     // -> MessageInfo contains additional metadata about the sent message 
@@ -129,5 +130,26 @@ pub mod exec {
 
         Ok(resp)
     }
+
+    pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+        let owner = OWNER.load(deps.storage)?;
+        if info.sender != owner {
+            return Err(StdError::generic_err("Unauthorized"));
+        }
+     
+        let balance = deps.querier.query_all_balances(&env.contract.address)?;
+        let bank_msg = BankMsg::Send {
+            to_address: info.sender.to_string(),
+            amount: balance,
+        };
+     
+        let resp = Response::new()
+            .add_message(bank_msg)
+            .add_attribute("action", "withdraw")
+            .add_attribute("sender", info.sender.as_str());
+     
+        Ok(resp)
+    }
+    
 
 }

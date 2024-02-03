@@ -37,6 +37,7 @@ pub enum ExecMsg {
         #[serde(default)]
         counter: u64,
     },
+    Withdraw {},
 }
 
 /// second message I created is a response to the Value query
