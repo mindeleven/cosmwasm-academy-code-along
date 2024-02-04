@@ -53,7 +53,7 @@ pub mod exec {
     // use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
     use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
  
-    use crate::state::{COUNTER, MINIMAL_DONATION, OWNER};
+    use crate::{error::ContractError, state::{COUNTER, MINIMAL_DONATION, OWNER}};
 
     // adding the MessageInfo to the update function
     // -> MessageInfo contains additional metadata about the sent message 
@@ -134,12 +134,16 @@ pub mod exec {
     }
     
     // handler for the execution message variant
-    pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
+    pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
         let owner = OWNER.load(deps.storage)?;
         // we need to check if the message sender is the one who created a contract
         if info.sender != owner {
             // if not, we immediately fail execution with some generic error
-            return Err(StdError::generic_err("Unauthorized"));
+            // return Err(StdError::generic_err("Unauthorized"));
+            // using our custom error type for our contract instead
+            return Err(ContractError::Unauthorized {
+                owner: owner.to_string(),
+            });
         }
         
         // then we need to figure out how much funds to send to the contract owner
