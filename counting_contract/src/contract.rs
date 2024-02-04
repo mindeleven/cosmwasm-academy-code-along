@@ -51,7 +51,7 @@ pub mod query {
 /// creating a message handler for the execute entry point
 pub mod exec {
     // use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
-    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
+    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdResult};
  
     use crate::{error::ContractError, state::{COUNTER, MINIMAL_DONATION, OWNER}};
 

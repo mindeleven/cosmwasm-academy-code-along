@@ -9,6 +9,7 @@ use cosmwasm_std::{
     entry_point, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_json_binary
 };
 
+use error::ContractError;
 use msg::InstantiateMsg;
 
 /// contract module for logic implementation
@@ -79,14 +80,19 @@ pub fn execute(
     env: Env, 
     info: MessageInfo, 
     msg: msg::ExecMsg,
-) -> StdResult<Response> {
+) -> Result<Response, ContractError> {
     use contract::exec;
     use msg::ExecMsg::*;
  
     match msg {
         // Poke {} => exec::poke(deps, info),
-        Donate {} => exec::donate(deps, info),
-        Reset { counter } => exec::reset(deps, info, counter),
+        // return type of the execute entry point has been updated to return the c
+        // custom error Result<Response, ContractError>
+        // functionality here needs to be updated accordingly
+        // Donate {} => exec::donate(deps, info)
+        Donate {} => exec::donate(deps, info).map_err(ContractError::Std),
+        // Reset { counter } => exec::reset(deps, info, counter),
+        Reset { counter } => exec::reset(deps, info, counter).map_err(ContractError::Std),
         Withdraw {} => exec::withdraw(deps, env, info),
     }
 }
