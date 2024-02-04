@@ -27,7 +27,7 @@ pub enum QueryMsg {
 // creating a new message for the execute entry point
 // define an enum with a single variant per execution message we want to handle
 // the message handler for this is in src/contract.rs
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecMsg {
     // removing poke and adding donate Msg
@@ -39,6 +39,11 @@ pub enum ExecMsg {
     },
     // execution message variant to send funds
     Withdraw {},
+    WithdrawTo {
+        receiver: String,
+        #[serde(default)]
+        funds: Vec<Coin>,
+    },
 }
 
 /// second message I created is a response to the Value query

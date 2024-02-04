@@ -51,7 +51,9 @@ pub mod query {
 /// creating a message handler for the execute entry point
 pub mod exec {
     // use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
-    use cosmwasm_std::{BankMsg, DepsMut, Env, MessageInfo, Response, StdResult};
+    use cosmwasm_std::{
+        Coin, BankMsg, DepsMut, Env, MessageInfo, Response, StdResult, StdError, Uint128
+    };
  
     use crate::{error::ContractError, state::{COUNTER, MINIMAL_DONATION, OWNER}};
 
@@ -123,7 +125,12 @@ pub mod exec {
     // assignment lesson 6: adding another execution message
     // which resets an internal counter (setting it to given value)
     pub fn reset(deps: DepsMut, info: MessageInfo, counter: u64) -> StdResult<Response> {
-        COUNTER.save(deps.storage, &counter)?;
+        // COUNTER.save(deps.storage, &counter)?;
+
+        let owner = OWNER.load(deps.storage)?;
+        if info.sender != owner {
+            return Err(StdError::generic_err("Unauthorized"));
+        }
 
         let resp = Response::new()
             .add_attribute("action", "reset")
@@ -169,5 +176,43 @@ pub mod exec {
         Ok(resp)
     }
     
+    pub fn withdraw_to(
+        deps: DepsMut,
+        env: Env,
+        info: MessageInfo,
+        receiver: String,
+        funds: Vec<Coin>,
+    ) -> StdResult<Response> {
+        let owner = OWNER.load(deps.storage)?;
+        if info.sender != owner {
+            return Err(StdError::generic_err("Unauthorized"));
+        }
+
+        let mut balance = deps.querier.query_all_balances(&env.contract.address)?;
+
+        if !funds.is_empty() {
+            for coin in &mut balance {
+                let limit = funds
+                    .iter()
+                    .find(|c| c.denom == coin.denom)
+                    .map(|c| c.amount)
+                    .unwrap_or(Uint128::zero());
+
+                coin.amount = std::cmp::min(coin.amount, limit);
+            }
+        }
+
+        let bank_msg = BankMsg::Send {
+            to_address: receiver,
+            amount: balance,
+        };
+
+        let resp = Response::new()
+            .add_message(bank_msg)
+            .add_attribute("action", "withdraw")
+            .add_attribute("sender", info.sender.as_str());
+
+        Ok(resp)
+    }
 
 }
