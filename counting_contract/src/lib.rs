@@ -16,6 +16,7 @@ use msg::InstantiateMsg;
 mod contract;
 pub mod msg;
 mod state;
+mod error;
 
 /// the entry point is the first function called by CosmWasm virtual machine 
 /// when action is performed on a smart contract
