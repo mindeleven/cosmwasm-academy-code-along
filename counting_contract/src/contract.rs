@@ -2,6 +2,8 @@ use cosmwasm_std::{Coin, DepsMut, Response, StdResult, MessageInfo};
 
 use crate::state::{COUNTER, MINIMAL_DONATION, OWNER};
 
+// there's no creator added to the instantiation message
+// we are relying on who sends the instantiation message
 pub fn instantiate(
     deps: DepsMut,
     info: MessageInfo,
@@ -130,19 +132,31 @@ pub mod exec {
 
         Ok(resp)
     }
-
+    
+    // handler for the execution message variant
     pub fn withdraw(deps: DepsMut, env: Env, info: MessageInfo) -> StdResult<Response> {
         let owner = OWNER.load(deps.storage)?;
+        // we need to check if the message sender is the one who created a contract
         if info.sender != owner {
+            // if not, we immediately fail execution with some generic error
             return Err(StdError::generic_err("Unauthorized"));
         }
-     
+        
+        // then we need to figure out how much funds to send to the contract owner
+        // because we want to send all the funds we query the blockchain for its state 
+        // via a a querier object on the deps argument
+        // to get the contract's address we use the env entry point argument
+        // it contains all relevant meta information like the currently executed contract address
         let balance = deps.querier.query_all_balances(&env.contract.address)?;
+        // preparing the message for the blockchain: the message we are looking for is a BankMsg
+        // particularly the Send variant of a BankMsg
+        // it takes a funds receiver and amount
         let bank_msg = BankMsg::Send {
             to_address: info.sender.to_string(),
             amount: balance,
         };
-     
+        
+        // we can add the Send variant of a BankMsg to the Response using the add_message method
         let resp = Response::new()
             .add_message(bank_msg)
             .add_attribute("action", "withdraw")

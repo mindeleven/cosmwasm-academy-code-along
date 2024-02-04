@@ -322,6 +322,7 @@ mod test {
     
     #[test]
     fn withdraw() {
+        //  one way of sending funds is to send a bank message to the blockchain
         let owner = Addr::unchecked("owner");
         let sender = Addr::unchecked("sender");
 

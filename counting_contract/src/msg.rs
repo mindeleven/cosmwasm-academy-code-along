@@ -37,6 +37,7 @@ pub enum ExecMsg {
         #[serde(default)]
         counter: u64,
     },
+    // execution message variant to send funds
     Withdraw {},
 }
 
