@@ -126,7 +126,8 @@ pub mod exec {
     // assignment lesson 6: adding another execution message
     // which resets an internal counter (setting it to given value)
     pub fn reset(deps: DepsMut, info: MessageInfo, counter: u64) -> Result<Response, ContractError>  {
-        // COUNTER.save(deps.storage, &counter)?;
+        
+        COUNTER.save(deps.storage, &counter)?;
 
         let owner = OWNER.load(deps.storage)?;
         if info.sender != owner {
