@@ -52,7 +52,7 @@ pub mod query {
 pub mod exec {
     // use cosmwasm_std::{DepsMut, MessageInfo, Response, StdResult};
     use cosmwasm_std::{
-        Coin, BankMsg, DepsMut, Env, MessageInfo, Response, StdResult, StdError, Uint128
+        Coin, BankMsg, DepsMut, Env, MessageInfo, Response, StdResult, Uint128
     };
  
     use crate::{error::ContractError, state::{COUNTER, MINIMAL_DONATION, OWNER}};
@@ -124,12 +124,15 @@ pub mod exec {
     
     // assignment lesson 6: adding another execution message
     // which resets an internal counter (setting it to given value)
-    pub fn reset(deps: DepsMut, info: MessageInfo, counter: u64) -> StdResult<Response> {
+    pub fn reset(deps: DepsMut, info: MessageInfo, counter: u64) -> Result<Response, ContractError>  {
         // COUNTER.save(deps.storage, &counter)?;
 
         let owner = OWNER.load(deps.storage)?;
         if info.sender != owner {
-            return Err(StdError::generic_err("Unauthorized"));
+            // return Err(StdError::generic_err("Unauthorized"));
+            return Err(ContractError::Unauthorized {
+                owner: owner.to_string(),
+            });
         }
 
         let resp = Response::new()
@@ -182,10 +185,13 @@ pub mod exec {
         info: MessageInfo,
         receiver: String,
         funds: Vec<Coin>,
-    ) -> StdResult<Response> {
+    ) -> Result<Response, ContractError> {
         let owner = OWNER.load(deps.storage)?;
         if info.sender != owner {
-            return Err(StdError::generic_err("Unauthorized"));
+            // return Err(StdError::generic_err("Unauthorized"));
+            return Err(ContractError::Unauthorized {
+                owner: owner.to_string(),
+            });
         }
 
         let mut balance = deps.querier.query_all_balances(&env.contract.address)?;
