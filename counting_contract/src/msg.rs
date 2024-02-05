@@ -27,6 +27,8 @@ pub struct InstantiateMsg {
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
+    // #[returns(...)] attribute is now required on every query variant
+    // it describes what response type is returned for the particular query
     #[returns(ValueResp)]
     // curly braces here are related to how serde is serializing JSON values
     Value {},
