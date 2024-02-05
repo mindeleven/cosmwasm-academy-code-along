@@ -1,7 +1,8 @@
 use cosmwasm_std::Coin;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct InstantiateMsg {
     #[serde(default)]
@@ -16,7 +17,7 @@ pub struct InstantiateMsg {
 /// every single variant is a separate query the contract understands
 /// the message has to derive Deserialize and implement Serialize
 /// so it can be used to send this message from a different contract or tests
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
     // curly braces here are related to how serde is serializing JSON values
@@ -27,7 +28,7 @@ pub enum QueryMsg {
 // creating a new message for the execute entry point
 // define an enum with a single variant per execution message we want to handle
 // the message handler for this is in src/contract.rs
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecMsg {
     // removing poke and adding donate Msg
@@ -49,7 +50,7 @@ pub enum ExecMsg {
 /// second message I created is a response to the Value query
 /// very similar to the Query message but a struct this time
 /// the rename_all attribute is unnecessary but there for consistency
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct ValueResp {
     pub value: u64,
