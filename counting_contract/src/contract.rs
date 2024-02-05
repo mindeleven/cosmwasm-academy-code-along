@@ -42,10 +42,11 @@ pub mod query {
     
     // assignment lesson 3: add query to the contract 
     // taking a single number as its argument and returning the send argument incremented
+    /* 
     pub fn incremented(value: u64) -> ValueResp {
         ValueResp { value: value + 1 }
     }
-    
+    */
 }
 
 /// creating a message handler for the execute entry point

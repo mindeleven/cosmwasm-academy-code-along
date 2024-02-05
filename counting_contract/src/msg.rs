@@ -2,6 +2,7 @@ use cosmwasm_std::Coin;
 use cosmwasm_schema::cw_serde;
 // use schemars::JsonSchema;
 // use serde::{Deserialize, Serialize};
+use cosmwasm_schema::QueryResponses;
 
 // #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 // #[serde(rename_all = "snake_case")]
@@ -24,10 +25,12 @@ pub struct InstantiateMsg {
 // #[serde(rename_all = "snake_case")]
 // replacing precious derives with #[cw_serde]
 #[cw_serde]
+#[derive(QueryResponses)]
 pub enum QueryMsg {
+    #[returns(ValueResp)]
     // curly braces here are related to how serde is serializing JSON values
     Value {},
-    Incremented { value: u64 },
+    // Incremented { value: u64 },
 }
 
 // creating a new message for the execute entry point

@@ -125,7 +125,7 @@ pub fn query(
     match msg {
         // Value {} => to_json_binary(&query::value()),
         Value {} => to_json_binary(&query::value(deps)?),
-        Incremented { value } => to_json_binary(&query::incremented(value)),
+        // Incremented { value } => to_json_binary(&query::incremented(value)),
     }
 }
 
