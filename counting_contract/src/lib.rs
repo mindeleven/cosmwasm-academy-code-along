@@ -16,6 +16,9 @@ use msg::InstantiateMsg;
 /// it's private because it contains internal contract logic
 mod contract;
 pub mod msg;
+/// mod multitest will only be in test, not in binary
+#[cfg(test)]
+pub mod multitest; 
 mod state;
 mod error;
 
